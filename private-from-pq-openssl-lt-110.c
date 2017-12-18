@@ -60,8 +60,6 @@ main (int argc, char *argv[])
   BN_mod_inverse (iqmp, q, p, ctx);
 
   /* Populate key data structure */
-  // skatkuri: This works for OpenSSL version prior to 1.1.0
-  /*
   key->n = n;
   key->e = e;
   key->d = d;
@@ -70,11 +68,6 @@ main (int argc, char *argv[])
   key->dmp1 = dmp1;
   key->dmq1 = dmq1;
   key->iqmp = iqmp;
-  */
-
-  RSA_set0_key(key, n, e, d);
-  RSA_set0_factors(key, p, q);
-  RSA_set0_crt_params(key, dmp1, dmp1, iqmp);
 
   /* Output the private key in human-readable and PEM forms */
   RSA_print_fp (stdout, key, 5);
@@ -83,10 +76,9 @@ main (int argc, char *argv[])
 
   /* Release allocated objects */
   BN_CTX_free (ctx);
+  RSA_free(key); /* also frees n, e, d, p, q, dmp1, dmq1, iqmp */
   BN_clear_free (phi);
   BN_clear_free (p1);
   BN_clear_free (q1);
-  // FIXME: skatkuri: This strangely seg faults
-  // RSA_free(key); /* also frees n, e, d, p, q, dmp1, dmq1, iqmp */
 
 }
